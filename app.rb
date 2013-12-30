@@ -7,12 +7,8 @@ require 'nokogiri'
 require 'open-uri'
 require 'date'
 def pastnews(datetime)
-	datetime_year=datetime.split('-')[0]
-	datetime_month=datetime.split('-')[1]
-	datetime_day=datetime.split('-')[2]
-	datetimestart=datetime_year+datetime_month+datetime_day
-	datetimestop=datetime_year+datetime_month+(datetime_day.to_i+1).to_s
-	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+datetimestart+"&period_end="+datetimestop
+	today, tomorrow = Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
+	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+today+"&period_end="+tomorrow
 	xml_doc = Nokogiri::XML(open(url))
 	output=""
 	xml_doc.xpath('news/article').each do |element|
