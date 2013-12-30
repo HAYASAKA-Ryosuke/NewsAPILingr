@@ -6,6 +6,8 @@ require "rexml/document"
 require 'nokogiri'
 require 'open-uri'
 require 'date'
+require 'time'
+
 def pastnews(datetime)
 	today, tomorrow = Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
 	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+today+"&period_end="+tomorrow
@@ -14,7 +16,7 @@ def pastnews(datetime)
 	xml_doc.xpath('news/article').each do |element|
 		output += element.xpath('title').text+"\n"+element.xpath('url').text
 	end
-	return output+'\n'+'powered by 日テレアプリ'
+	return output+'powered by 日テレアプリ'
 end
 
 def todaynews
@@ -30,7 +32,7 @@ def todaynews
 	xml_doc.xpath('news/article').each do |element|
 		output += element.xpath('title').text+"\n\r"+element.xpath('url').text
 	end
-	return output+'\n'+'http://www.ntv.co.jp/appli/api/howto/img/credit_api.gif'
+	return output+'powered by 日テレアプリ'
 end
 
 post '/newslingr' do
@@ -40,12 +42,6 @@ post '/newslingr' do
                 data["events"].each do |e, text=e["message"]["text"]|
                         if text.index("!datenews") != nil
                                 return pastnews(text.split(" ")[1])
-                                #if(text.split(" ")[1].include?("-")==true) then
-                                #        return pastnews(text.split(" ")[1])
-                                #        #return 'http://v157-7-153-173.z1d1.static.cnode.jp/tmpfigure/TodenGraphDayLingr/PowerUsageGraph'+dateyear.to_s+'-'+datemon.to_s+'-'+dateday.to_s+'.png'
-                                #else
-                                #        return todaynews
-                                #end
 			else
 				return ""
                         end
