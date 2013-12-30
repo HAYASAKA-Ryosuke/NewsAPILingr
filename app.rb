@@ -20,17 +20,31 @@ def pastnews(datetime)
 end
 
 def todaynews
-	datetime=DateTime.now.strftime('%F')
-	datetime_year=datetime.split('-')[0]
-	datetime_month=datetime.split('-')[1]
-	datetime_day=datetime.split('-')[2]
-	datetimestart=datetime_year+datetime_month+datetime_day
-	datetimestop=datetime_year+datetime_month+(datetime_day.to_i+1).to_s
-	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+datetimestart+"&period_end="+datetimestop
+	today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now+24*60*60).strftime("%Y%m%d")
+	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+today+"&period_end="+tomorrow
 	xml_doc = Nokogiri::XML(open(url))
 	output=""
 	xml_doc.xpath('news/article').each do |element|
 		output += element.xpath('title').text+"\n\r"+element.xpath('url').text
+	end
+	return output+'powered by 日テレアプリ'
+end
+
+def news(datetime)
+	if datetime != 'now'
+		return pastnews(datetime)
+	else
+		return todaynews
+	end
+end
+
+def todaynews
+	today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now+24*60*60).strftime("%Y%m%d")
+	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=Ctbt3M234jvKsMobkFczvY3J5r2nFxmIipy1uVk7z6PHm45KV7KlwYuNyBxM&word=*&period_start="+today+"&period_end="+tomorrow
+	xml_doc = Nokogiri::XML(open(url))
+	output=""
+	xml_doc.xpath('news/article').each do |element|
+		output += element.xpath('title').text+"\n"+element.xpath('url').text+"\n"
 	end
 	return output+'powered by 日テレアプリ'
 end
@@ -41,7 +55,7 @@ post '/newslingr' do
         if data["status"] == "ok" and data["events"]
                 data["events"].each do |e, text=e["message"]["text"]|
                         if text.index("!datenews") != nil
-                                return pastnews(text.split(" ")[1])
+                                return news(text.split(" ")[1])
 			else
 				return ""
                         end
