@@ -8,45 +8,19 @@ require 'open-uri'
 require 'date'
 require 'time'
 
-def pastnews(datetime)
-	today, tomorrow = Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
-	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+today+"&period_end="+tomorrow
-	xml_doc = Nokogiri::XML(open(url))
-	output=""
-	xml_doc.xpath('news/article').each do |element|
-		output += element.xpath('title').text+"\n"+element.xpath('url').text
-	end
-	return output+'powered by 日テレアプリ'
-end
-
-def todaynews
-	today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now+24*60*60).strftime("%Y%m%d")
-	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start="+today+"&period_end="+tomorrow
-	xml_doc = Nokogiri::XML(open(url))
-	output=""
-	xml_doc.xpath('news/article').each do |element|
-		output += element.xpath('title').text+"\n\r"+element.xpath('url').text
-	end
-	return output+'powered by 日テレアプリ'
-end
-
-def news(datetime)
-	if datetime != 'now'
-		return pastnews(datetime)
+def news(datetime = "now")
+	if datetime == "now"
+		today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now-24*60*60).strftime("%Y%m%d")
 	else
-		return todaynews
+		today, tomorrow = Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
 	end
-end
-
-def todaynews
-	today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now+24*60*60).strftime("%Y%m%d")
-	url="http://appli.ntv.co.jp/ntv_WebAPI/news/?key=Ctbt3M234jvKsMobkFczvY3J5r2nFxmIipy1uVk7z6PHm45KV7KlwYuNyBxM&word=*&period_start="+today+"&period_end="+tomorrow
+	url = "http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start=" + today + "&period_end=" + tomorrow
 	xml_doc = Nokogiri::XML(open(url))
-	output=""
+	output = ""
 	xml_doc.xpath('news/article').each do |element|
 		output += element.xpath('title').text+"\n"+element.xpath('url').text+"\n"
 	end
-	return output+'powered by 日テレアプリ'
+	return output + 'powered by 日テレアプリ'
 end
 
 post '/newslingr' do
