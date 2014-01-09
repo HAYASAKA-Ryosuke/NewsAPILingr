@@ -10,11 +10,11 @@ require 'time'
 
 def news(datetime = "now")
 	if datetime == "now"
-		today, tomorrow = Time.now.strftime("%Y%m%d"), (Time.now-24*60*60).strftime("%Y%m%d")
+		starttime, endtime= (Time.now-24*60*60).strftime("%Y%m%d"),Time.now.strftime("%Y%m%d")
 	else
-		today, tomorrow = Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
+		starttime, endtime= Time.parse(datetime).strftime("%Y%m%d"), (Time.parse(datetime)+24*60*60).strftime("%Y%m%d")
 	end
-	url = "http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start=" + today + "&period_end=" + tomorrow
+	url = "http://appli.ntv.co.jp/ntv_WebAPI/news/?key=YourKey&word=*&period_start=" + starttime + "&period_end=" + endtime
 	xml_doc = Nokogiri::XML(open(url))
 	output = ""
 	xml_doc.xpath('news/article').each do |element|
