@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 require 'sinatra'
 require 'json'
 require "rexml/document"
@@ -21,6 +20,21 @@ def news(datetime = "now")
 		output += element.xpath('title').text+"\n"+element.xpath('url').text+"\n"
 	end
 	return output + 'powered by 日テレアプリ'
+end
+
+def fun
+  t = Date.today
+  y = t - 1
+  url = "http://appli.ntv.co.jp/ntv_WebAPI/news/?key=#{ENV["YOUR_KEY"] || "YOUR_KEY"}&word=*&period_start=#{y.strftime('%Y%m%d')}&period_end=#{t.strftime('%Y%m%d')}"
+  images(url).sample
+end
+
+def images(url)
+	xml_doc = Nokogiri::XML(open(url))
+  xml_doc.xpath('news/article').map do |element|
+    path = element.xpath('thumbnail_url').text.strip
+    path if path != ""
+  end.compact
 end
 
 post '/newslingr' do
